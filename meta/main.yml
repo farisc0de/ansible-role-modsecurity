@@ -1,0 +1,29 @@
+---
+galaxy_info:
+  role_name: modsecurity
+  author: Faris AL-Otaibi
+  description: Ansible Role to Install and Configure Apache mod_security2
+  namespace: "farisc0de"
+  license: MIT
+  min_ansible_version: "2.9"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+
+  galaxy_tags:
+    - security
+    - web
+    - apache
+    - modsecurity
+    - waf
+    - owasp
+    - crs
+
+dependencies: []
