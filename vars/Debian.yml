@@ -1,0 +1,5 @@
+---
+_modsecurity_conf_path: "/etc/modsecurity/modsecurity.conf"
+_modsecurity_recommended_conf: "/etc/modsecurity/modsecurity.conf-recommended"
+_apache_modsecurity_config: "/etc/apache2/mods-enabled/security2.conf"
+_crs_final_path: "/etc/apache2/modsecurity-crs"

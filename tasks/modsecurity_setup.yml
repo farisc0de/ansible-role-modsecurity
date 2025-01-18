@@ -1,0 +1,32 @@
+---
+- name: Check if ModSecurity configuration file exists
+  ansible.builtin.stat:
+    path: "{{ modsecurity_conf_path }}"
+  register: modsecurity_conf
+
+- name: Copy recommended ModSecurity configuration
+  ansible.builtin.copy:
+    src: "{{ modsecurity_recommended_conf }}"
+    dest: "{{ modsecurity_conf_path }}"
+    remote_src: true
+    mode: "0644"
+  when: not modsecurity_conf.stat.exists
+  notify: Restart apache
+
+- name: Configure ModSecurity engine mode
+  ansible.builtin.replace:
+    path: "{{ modsecurity_conf_path }}"
+    regexp: "SecRuleEngine DetectionOnly"
+    replace: "SecRuleEngine {{ modsecurity_detection_only | bool | ternary('DetectionOnly', 'On') }}"
+    backup: true
+  when: modsecurity_conf.stat.exists
+  notify: Restart apache
+
+- name: Configure ModSecurity audit log parts
+  ansible.builtin.replace:
+    path: "{{ modsecurity_conf_path }}"
+    regexp: "SecAuditLogParts .*"
+    replace: "SecAuditLogParts {{ modsecurity_audit_log_parts }}"
+    backup: true
+  when: modsecurity_conf.stat.exists
+  notify: Restart apache

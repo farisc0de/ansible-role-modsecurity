@@ -1,0 +1,16 @@
+---
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  tags: [always]
+
+- name: Setup ModSecurity configuration
+  ansible.builtin.include_tasks: modsecurity_setup.yml
+  when: modsecurity_enabled | bool
+  tags: [modsecurity]
+
+- name: Setup OWASP CRS
+  ansible.builtin.include_tasks: owasp_crs_setup.yml
+  when:
+    - modsecurity_enabled | bool
+    - apache_security_crs_enabled | bool
+  tags: [owasp_crs]

@@ -1,0 +1,19 @@
+---
+# ModSecurity configuration
+modsecurity_enabled: true
+modsecurity_detection_only: false
+modsecurity_audit_log_parts: "ABCEFHJKZ"
+
+# OWASP CRS configuration
+modsecurity_crs_version: "3.3.5"
+modsecurity_crs_enabled: true
+
+# OS-specific paths with defaults for Debian/Ubuntu
+modsecurity_conf_path: "{{ _modsecurity_conf_path }}"
+modsecurity_recommended_conf: "{{ _modsecurity_recommended_conf }}"
+modsecurity_apache_config: "{{ _apache_modsecurity_config }}"
+
+# CRS paths
+modsecurity_crs_zip_dest: "/home/{{ ansible_user }}/coreruleset-{{ modsecurity_crs_version }}.zip"
+modsecurity_crs_extract_path: "/home/{{ ansible_user }}/coreruleset-{{ modsecurity_crs_version }}"
+modsecurity_crs_final_path: "{{ _crs_final_path }}/coreruleset-{{ modsecurity_crs_version }}"

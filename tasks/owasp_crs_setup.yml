@@ -1,0 +1,50 @@
+---
+- name: Download OWASP CRS zip file
+  ansible.builtin.get_url:
+    url: "https://github.com/coreruleset/coreruleset/archive/refs/tags/v{{ apache_security_crs_version }}.zip"
+    dest: "{{ crs_zip_dest }}"
+    mode: "0644"
+
+- name: Extract OWASP CRS files
+  ansible.builtin.unarchive:
+    src: "{{ crs_zip_dest }}"
+    dest: "{{ crs_extract_path | dirname }}"
+    remote_src: true
+    creates: "{{ crs_extract_path }}"
+
+- name: Ensure ModSecurity CRS directory exists
+  ansible.builtin.file:
+    path: "{{ crs_final_path | dirname }}"
+    state: directory
+    mode: "0755"
+
+- name: Check if CRS directory exists
+  ansible.builtin.stat:
+    path: "{{ crs_final_path }}"
+  register: crs_directory
+
+- name: Copy CRS files to ModSecurity CRS directory
+  ansible.builtin.copy:
+    src: "{{ crs_extract_path }}/"
+    dest: "{{ crs_final_path }}"
+    remote_src: true
+    mode: "0755"
+  when: not crs_directory.stat.exists
+
+- name: Enable CRS configuration
+  ansible.builtin.copy:
+    src: "{{ crs_final_path }}/crs-setup.conf.example"
+    dest: "{{ crs_final_path }}/crs-setup.conf"
+    remote_src: true
+    mode: "0644"
+    force: false
+
+- name: Configure Apache ModSecurity to use OWASP CRS
+  ansible.builtin.blockinfile:
+    path: "{{ apache_modsecurity_config }}"
+    block: |
+      IncludeOptional {{ crs_final_path }}/crs-setup.conf
+      IncludeOptional {{ crs_final_path }}/rules/*.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - OWASP CRS CONFIGURATION"
+    backup: true
+  notify: Restart apache
